@@ -635,31 +635,28 @@ namespace Fragsurf.Movement
             crouchLerp = Mathf.Lerp(crouchLerp, wantsToCrouch ? 1f : 0f, _deltaTime * _surfer.moveData.crouchingSpeed);
 
             // Collider and position changing
-            if (crouchLerp > 0.5f && !crouching)
+            if (crouchLerp > 0.1f && !crouching)
             {
                 // Begin crouching
                 crouching = true;
-                if (_surfer.collider.GetType() == typeof(BoxCollider))
+                if (_surfer.collider is BoxCollider boxCollider)
                 {
                     // Box collider
-                    BoxCollider boxCollider = (BoxCollider) _surfer.collider;
                     boxCollider.size = new Vector3(boxCollider.size.x, _surfer.moveData.defaultHeight * crouchingHeight,
                         boxCollider.size.z);
                 }
-                else if (_surfer.collider.GetType() == typeof(CapsuleCollider))
+                else if (_surfer.collider is CapsuleCollider capsuleCollider)
                 {
                     // Capsule collider
-                    CapsuleCollider capsuleCollider = (CapsuleCollider) _surfer.collider;
                     capsuleCollider.height = _surfer.moveData.defaultHeight * crouchingHeight;
                 }
 
                 // Move position and stuff
-                _surfer.moveData.origin += heightDifference / 2 * (grounded ? Vector3.down : Vector3.up);
+                _surfer.moveData.origin += heightDifference / 2 * Vector3.down;
                 foreach (Transform child in playerTransform)
                 {
                     if (child == _surfer.moveData.viewTransform)
-                        child.localPosition = new Vector3(child.localPosition.x, child.localPosition.y / crouchingHeight,
-                            child.localPosition.z);
+                        continue;
 
                     child.localPosition = new Vector3(child.localPosition.x, child.localPosition.y * crouchingHeight,
                         child.localPosition.z);
@@ -681,20 +678,18 @@ namespace Fragsurf.Movement
                     canUncrouch = false;
 
                 // Uncrouch
-                if (canUncrouch && crouchLerp <= 0.5f)
+                if (canUncrouch && crouchLerp <= 0.9f)
                 {
                     crouching = false;
-                    if (_surfer.collider.GetType() == typeof(BoxCollider))
+                    if (_surfer.collider is BoxCollider boxCollider)
                     {
                         // Box collider
-                        BoxCollider boxCollider = (BoxCollider) _surfer.collider;
                         boxCollider.size = new Vector3(boxCollider.size.x, _surfer.moveData.defaultHeight,
                             boxCollider.size.z);
                     }
-                    else if (_surfer.collider.GetType() == typeof(CapsuleCollider))
+                    else if (_surfer.collider is CapsuleCollider capsuleCollider)
                     {
                         // Capsule collider
-                        CapsuleCollider capsuleCollider = (CapsuleCollider) _surfer.collider;
                         capsuleCollider.height = _surfer.moveData.defaultHeight;
                     }
 
